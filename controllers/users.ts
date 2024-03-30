@@ -15,12 +15,10 @@ async function create(req: Request, res: Response) {
     }
 
     if (!userData.roles || userData.roles.length === 0) {
-      return res
-        .status(400)
-        .json({
-          message:
-            "É necessário passar pelo menos uma função (role) ao criar um usuário.",
-        });
+      return res.status(400).json({
+        message:
+          "É necessário passar pelo menos uma função (role) ao criar um usuário.",
+      });
     }
 
     const hashedPassword = await bcrypt.hash(userData.password, 10);
@@ -43,4 +41,9 @@ async function create(req: Request, res: Response) {
   }
 }
 
-export default { create };
+async function getAll(req: Request, res: Response) {
+  const existingUser = await UsersRepository.findAll();
+  res.json(existingUser);
+}
+
+export default { create, getAll };
