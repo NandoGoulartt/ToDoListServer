@@ -1,5 +1,6 @@
 import { Request, Response } from "express";
 import { IUsers } from "../models/users";
+import bcrypt from "bcrypt";
 import UsersRepository from "../models/usersModel";
 
 async function create(req: Request, res: Response) {
@@ -11,10 +12,14 @@ async function create(req: Request, res: Response) {
     if (existingUser) {
       return res.status(400).json({ message: "Este email já está em uso." });
     }
+    
+    const hashedPassword = await bcrypt.hash(userData.password, 10);
+    userData.password = hashedPassword;
+
     const newUser = await UsersRepository.create({
       name: userData.name,
-      email: userData.name,
-      password: userData.name,
+      email: userData.email,
+      password: userData.password,
     });
     res.json({ message: "Usuário criado com sucesso.", user: newUser });
   } catch (error) {
