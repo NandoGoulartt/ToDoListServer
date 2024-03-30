@@ -3,4 +3,7 @@ export interface IUsers {
   name: string;
   email: string;
   password: string;
+  roles: string[];
+  createdAt: Date;
+  updatedAt: Date;
 }

@@ -4,11 +4,17 @@ import rolesModel from "./rolesModel";
 import usersModel from "./usersModel";
 
 export default db.define("user_role", {
+  id: {
+    type: Sequelize.INTEGER.UNSIGNED,
+    autoIncrement: true,
+    primaryKey: true,
+    allowNull: false,
+  },
   role_id: {
     type: Sequelize.INTEGER.UNSIGNED,
     allowNull: false,
     references: {
-      model: usersModel,
+      model: rolesModel,
       key: "id",
     },
   },
@@ -16,7 +22,7 @@ export default db.define("user_role", {
     type: Sequelize.INTEGER.UNSIGNED,
     allowNull: false,
     references: {
-      model: rolesModel,
+      model: usersModel,
       key: "id",
     },
   },
