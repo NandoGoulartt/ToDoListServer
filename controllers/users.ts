@@ -3,6 +3,8 @@ import { IUsers } from "../models/users";
 import bcrypt from "bcrypt";
 import UsersRepository from "../models/usersModel";
 import { getRolesId, create as createUsersRoles } from "./roles";
+import { AuthRequest } from "../middleware/auth";
+import userRolesModel from "../models/userRolesModel";
 
 async function create(req: Request, res: Response) {
   try {
@@ -41,9 +43,76 @@ async function create(req: Request, res: Response) {
   }
 }
 
-async function getAll(req: Request, res: Response) {
+async function getUsers(req: Request, res: Response) {
   const existingUser = await UsersRepository.findAll();
   res.json(existingUser);
 }
 
-export default { create, getAll };
+async function getUser(req: Request, res: Response) {
+  try {
+    const { id } = req.params;
+    const user = await UsersRepository.findByPk(id);
+    if (user) {
+      res.json(user);
+    } else {
+      res.status(404).json({ error: "Usuário não encontrado." });
+    }
+  } catch (error) {
+    res.status(500).json({ error: "Erro ao obter detalhes do usuário." });
+  }
+}
+
+async function deleteUser(req: AuthRequest, res: Response) {
+  try {
+    const { id } = req.params;
+    const user = await UsersRepository.findByPk(id);
+    if (req.userRoles) {
+      if (id != req.userId && !req.userRoles.includes("ADMIN")) {
+        return res
+          .status(401)
+          .json({ error: "Você não tem permissão para excluir este usuário." });
+      }
+      if (user) {
+        await userRolesModel.destroy({ where: { user_id: id } });
+        await user.destroy();
+        return res.json({ message: "Usuário excluído com sucesso." });
+      } else {
+        return res.status(404).json({ error: "Usuário não encontrado." });
+      }
+    }
+  } catch (error) {
+    console.error("Erro ao excluir usuário:", error);
+    return res.status(500).json({ error: "Erro ao excluir usuário." });
+  }
+}
+
+async function updateUser(req: AuthRequest, res: Response) {
+  try {
+    const { id } = req.params;
+    const { name, email, password } = req.body;
+    const user = await UsersRepository.findByPk(id);
+    if (req.userRoles) {
+      if (id != req.userId && !req.userRoles.includes("ADMIN")) {
+        return res
+          .status(401)
+          .json({ error: "Você não tem permissão para excluir este usuário." });
+      }
+      if (user) {
+        const updatedUserData = { name, email, password };
+        if (password) {
+          const hashedPassword = await bcrypt.hash(password, 10);
+          updatedUserData.password = hashedPassword;
+        }
+        await user.update(updatedUserData);
+        res.json(user);
+      } else {
+        return res.status(404).json({ error: "Usuário não encontrado." });
+      }
+    }
+  } catch (error) {
+    console.error("Erro ao excluir usuário:", error);
+    return res.status(500).json({ error: "Erro ao excluir usuário." });
+  }
+}
+
+export default { create, getUsers, getUser, deleteUser, updateUser };

@@ -3,6 +3,7 @@ import UsersRepository from "../models/usersModel";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 import UserRolesRepository from "../models/userRolesModel";
+import rolesModel from "../models/rolesModel";
 
 async function login(req: Request, res: Response) {
   const { email, password } = req.body;
@@ -33,8 +34,11 @@ async function login(req: Request, res: Response) {
       where: { user_id: user.dataValues.id },
     });
 
-    const roles = userRoles.map((userRole) => userRole.dataValues.role_id);
-
+    const rolesIds = userRoles.map((userRole) => userRole.dataValues.role_id);
+    const rolesData = await rolesModel.findAll({
+      where: { id: rolesIds },
+    });
+    const roles = rolesData.map((role) => role.dataValues.name);
     const token = jwt.sign(
       { userId: user.dataValues.id, email: user.dataValues.email, roles },
       process.env.JWT_SECRET || "palavraSecreta",
