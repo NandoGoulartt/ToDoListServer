@@ -2,12 +2,15 @@ import express from "express";
 import db from "./db";
 import authRouter from "./routes/auth";
 import usersRouter from "./routes/users";
+import taskRouter from "./routes/tasks";
+
 const app = express();
 const port = parseInt(`${process.env.PORT}`);
 
 app.use(express.json());
 app.use(authRouter);
 app.use(usersRouter);
+app.use(taskRouter);
 
 db.sync()
   .then(() => {

@@ -7,7 +7,7 @@ import { AuthRequest } from "../middleware/auth";
 import userRolesModel from "../models/userRolesModel";
 import { Op } from "sequelize";
 
-async function create(req: Request, res: Response) {
+async function createUser(req: Request, res: Response) {
   try {
     const userData = req.body as IUsers;
     const existingUser = await UsersRepository.findOne({
@@ -138,7 +138,7 @@ async function updateUser(req: AuthRequest, res: Response) {
 }
 
 export default {
-  create,
+  createUser,
   getUsers,
   getUser,
   deleteUser,
