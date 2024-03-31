@@ -6,7 +6,9 @@
   "main": "app.ts",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "dev": "npx ts-node-dev -r dotenv/config app.ts"
+    "dev": "npx ts-node-dev -r dotenv/config app.ts",
+    "db": "npx ts-node-dev -r dotenv/config database/initialSchema/initialSchema.ts",
+    "seed": "npx ts-node-dev -r dotenv/config database/seed/seed.ts"
   },
   "author": "",
   "license": "ISC",
