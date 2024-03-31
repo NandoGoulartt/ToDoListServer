@@ -8,4 +8,9 @@ router.get("/tasks", authMiddleware, tasksController.getTasks);
 router.get("/tasks/:id", authMiddleware, tasksController.getTask);
 router.post("/tasks/create", authMiddleware, tasksController.createTask);
 router.put("/tasks/:id", authMiddleware, tasksController.updateTask);
+router.patch(
+  "/tasks/:id/complete",
+  authMiddleware,
+  tasksController.completeTask
+);
 export default router;

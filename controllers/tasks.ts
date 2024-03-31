@@ -96,9 +96,40 @@ async function updateTask(req: AuthRequest, res: Response) {
   }
 }
 
+async function completeTask(req: AuthRequest, res: Response) {
+  try {
+    const { id } = req.params;
+
+    const task = await TasksRepository.findByPk(id);
+    if (!task) {
+      return res.status(404).json({ error: "Tarefa não encontrada." });
+    }
+
+    if (task.dataValues.completed == true) {
+      return res.status(400).json({ error: "Tarefa já esta finalizada." });
+    }
+
+    if (
+      task.dataValues.user_id != req.userId &&
+      !req.userRoles!.includes("ADMIN")
+    ) {
+      return res
+        .status(401)
+        .json({ error: "Você não tem permissão para finalizar esta tarefa." });
+    }
+
+    await task.update({ completed: true });
+    res.json({ task: task, message: "Tarefa finalizada com sucesso." });
+  } catch (error) {
+    console.error("Erro ao finalizada tarefa:", error);
+    res.status(500).json({ error: "Erro ao finalizada tarefa." });
+  }
+}
+
 export default {
   createTask,
   getTasks,
   getTask,
   updateTask,
+  completeTask,
 };
