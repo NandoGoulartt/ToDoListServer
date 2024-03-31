@@ -5,6 +5,7 @@ import UsersRepository from "../models/usersModel";
 import { getRolesId, create as createUsersRoles } from "./roles";
 import { AuthRequest } from "../middleware/auth";
 import userRolesModel from "../models/userRolesModel";
+import { Op } from "sequelize";
 
 async function create(req: Request, res: Response) {
   try {
@@ -62,6 +63,27 @@ async function getUser(req: Request, res: Response) {
   }
 }
 
+async function getSearchUser(req: Request, res: Response) {
+  try {
+    const { name } = req.query;
+
+    if (!name) {
+      return res.status(400).json({ error: "'name' não informado." });
+    }
+    const users = await UsersRepository.findAll({
+      where: { name: { [Op.like]: `${name}%` } },
+    });
+
+    if (users) {
+      res.json(users);
+    } else {
+      res.status(404).json({ error: "Usuários não encontrado." });
+    }
+  } catch (error) {
+    res.status(500).json({ error: "Erro ao obter usuários." });
+  }
+}
+
 async function deleteUser(req: AuthRequest, res: Response) {
   try {
     const { id } = req.params;
@@ -115,4 +137,11 @@ async function updateUser(req: AuthRequest, res: Response) {
   }
 }
 
-export default { create, getUsers, getUser, deleteUser, updateUser };
+export default {
+  create,
+  getUsers,
+  getUser,
+  deleteUser,
+  updateUser,
+  getSearchUser,
+};

@@ -6,6 +6,7 @@ const router = Router();
 
 router.post("/users/create", usersController.create);
 router.get("/users", authMiddleware, usersController.getUsers);
+router.get("/users/search", authMiddleware, usersController.getSearchUser);
 router.get("/users/:id", authMiddleware, usersController.getUser);
 router.delete("/users/:id", authMiddleware, usersController.deleteUser);
 router.put("/users/:id", authMiddleware, usersController.updateUser);
