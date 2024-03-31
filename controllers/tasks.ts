@@ -1,4 +1,4 @@
-import { Request, Response } from "express";
+import { Response } from "express";
 import TasksRepository from "../models/tasksModel";
 import { AuthRequest } from "../middleware/auth";
 
@@ -126,10 +126,34 @@ async function completeTask(req: AuthRequest, res: Response) {
   }
 }
 
+async function deleteTask(req: AuthRequest, res: Response) {
+  try {
+    const { id } = req.params;
+
+    const task = await TasksRepository.findByPk(id);
+    if (!task) {
+      return res.status(404).json({ error: "Tarefa não encontrada." });
+    }
+
+    if (!req.userRoles!.includes("ADMIN")) {
+      return res
+        .status(401)
+        .json({ error: "Você não tem permissão para exluir esta tarefa." });
+    }
+
+    await task.destroy();
+    res.json({ message: "Tarefa excluída com sucesso." });
+  } catch (error) {
+    console.error("Erro ao excluir tarefa:", error);
+    res.status(500).json({ error: "Erro ao excluir tarefa." });
+  }
+}
+
 export default {
   createTask,
   getTasks,
   getTask,
   updateTask,
   completeTask,
+  deleteTask,
 };

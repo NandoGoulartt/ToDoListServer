@@ -13,4 +13,6 @@ router.patch(
   authMiddleware,
   tasksController.completeTask
 );
+router.delete("/tasks/:id", authMiddleware, tasksController.deleteTask);
+
 export default router;
