@@ -26,6 +26,27 @@ async function createTask(req: AuthRequest, res: Response) {
   }
 }
 
+async function getTasks(req: AuthRequest, res: Response) {
+  try {
+    const userId = req.userId;
+    let tasks;
+    if (req.userRoles) {
+      if (!req.userRoles.includes("ADMIN")) {
+        tasks = await TasksRepository.findAll({
+          where: { user_id: userId },
+        });
+      } else {
+        tasks = await TasksRepository.findAll();
+      }
+      return res.json(tasks);
+    }
+  } catch (error) {
+    console.error("Erro ao obter todas as tarefas:", error);
+    res.status(500).json({ error: "Erro ao obter todas as tarefas." });
+  }
+}
+
 export default {
   createTask,
+  getTasks,
 };
