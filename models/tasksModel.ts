@@ -1,6 +1,5 @@
 import db from "../db";
 import Sequelize from "sequelize";
-import usersModel from "./usersModel";
 
 export default db.define("task", {
   id: {
@@ -17,17 +16,8 @@ export default db.define("task", {
     type: Sequelize.STRING,
     allowNull: false,
   },
-  completed: {
-    type: Sequelize.BOOLEAN,
+  prazo: {
+    type: Sequelize.DATE,
     allowNull: false,
-    defaultValue: 0,
-  },
-  user_id: {
-    type: Sequelize.INTEGER.UNSIGNED,
-    allowNull: false,
-    references: {
-      model: usersModel,
-      key: "id",
-    },
-  },
+  }
 });

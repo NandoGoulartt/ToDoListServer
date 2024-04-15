@@ -3,10 +3,11 @@ import db from "./db";
 import authRouter from "./routes/auth";
 import usersRouter from "./routes/users";
 import taskRouter from "./routes/tasks";
+const cors = require('cors');
 
 const app = express();
 const port = parseInt(`${process.env.PORT}`);
-
+app.use(cors());
 app.use(express.json());
 app.use(authRouter);
 app.use(usersRouter);

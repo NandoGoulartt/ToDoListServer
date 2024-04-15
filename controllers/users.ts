@@ -2,7 +2,6 @@ import { Request, Response } from "express";
 import { IUsers } from "../models/users";
 import bcrypt from "bcrypt";
 import UsersRepository from "../models/usersModel";
-import { getRolesId, create as createUsersRoles } from "./roles";
 import { AuthRequest } from "../middleware/auth";
 import userRolesModel from "../models/userRolesModel";
 import { Op } from "sequelize";
@@ -17,15 +16,12 @@ async function createUser(req: Request, res: Response) {
       return res.status(400).json({ message: "Este email já está em uso." });
     }
 
-    if (!userData.roles || userData.roles.length === 0) {
-      return res.status(400).json({
-        message:
-          "É necessário passar pelo menos uma função (role) ao criar um usuário.",
-      });
+    if (userData.password !== userData.confirmPassword) {
+      return res.status(400).json({ message: "As senhas não são iguais." });
     }
-
     const hashedPassword = await bcrypt.hash(userData.password, 10);
     userData.password = hashedPassword;
+
 
     const newUser = await UsersRepository.create({
       name: userData.name,
@@ -33,11 +29,6 @@ async function createUser(req: Request, res: Response) {
       password: userData.password,
     });
 
-    const roleIds = await getRolesId(userData.roles);
-    for (const role of roleIds) {
-      await createUsersRoles(newUser.dataValues.id, role);
-    }
-    newUser.dataValues.roles = roleIds;
     res.json({ message: "Usuário criado com sucesso.", user: newUser });
   } catch (error) {
     res.json(error);
